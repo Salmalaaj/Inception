@@ -1,18 +1,11 @@
 FROM debian:bullseye
 
-RUN apt update && apt install -y mariadb-server
-# The mariadb-server package includes the core components required 
-# to run the MariaDB database server. These components handle tasks 
-# such as data storage, retrieval, access control, and more.
-# When you install mariadb-server, you're essentially installing the
-# software that allows you to set up and run your own database server using MariaDB.
+RUN apt-get update && apt-get upgrade -y && apt-get install -y mariadb-server
 
-# Copy the script into the container
-COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+RUN	sed -i 's/bind-address            = 127.0.0.1/bind-address            = 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
 
 COPY ./tools/script.sh script.sh
 
 RUN chmod +x script.sh
 
-CMD ["tail",  "-f",  "/dev/null"]
-
+CMD ["./script.sh"]

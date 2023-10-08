@@ -1,68 +1,56 @@
-version: "3"
+version: '3'
 
 services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    build: ./requirements/mariadb/
+    volumes:
+      - mariadb:/var/lib/mysql/
+    networks:
+      - inception
+    env_file:
+      - .env
+    restart: always
   wordpress:
+    image: wordpress
     container_name: wordpress
+    build: ./requirements/wordpress/
+    volumes:
+      - wordpress:/var/www/html/wordpress/
+    networks:
+      - inception
     depends_on:
       - mariadb
-    ports:
-      - "9000:9000"
     env_file:
       - .env
-    build:
-      context: requirements/wordpress/
-      dockerfile: Dockerfile
-    volumes:
-      - wp_vl:/var/www/html
-    image: wordpress:latest
     restart: always
-    networks:
-      - my_network
-
-  mariadb:
-    container_name: mariadb
-    env_file:
-      - ./.env
-    restart: always
-    networks:
-      - my_network
-    build: 
-      context: requirements/mariadb/
-      dockerfile: Dockerfile
-    volumes:
-      - db_vl:/var/lib/mysql
-
   nginx:
+    image: nginx
     container_name: nginx
+    build: ./requirements/nginx/
+    ports:
+      - 443:443
+      - 80:80
+    volumes:
+      - wordpress:/var/www/html/wordpress/
+    networks:
+      - inception
     depends_on:
       - wordpress
-    ports:
-      - "9999:433"
-    env_file:
-      - .env
-    build:
-      context: requirements/nginx
-      dockerfile: Dockerfile
     restart: always
-    volumes:
-      - wp_vl:/var/www/html
-    networks:
-      - my_network
 
 volumes:
-  wp_vl:
-    driver: local
+  mariadb:
     driver_opts:
       type: none
       o: bind
-
-  db_vl:
-    driver: local
+      device: /home/slaajour/data/mariadb/
+  wordpress:
     driver_opts:
       type: none
       o: bind
-
+      device: /home/slaajour/data/wordpress/
 
 networks:
-  my_network:
-    driver: bridge
+  inception:
