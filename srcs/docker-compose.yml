@@ -2,40 +2,42 @@ version: '3'
 
 services:
   mariadb:
-    image: mariadb
-    container_name: mariadb
     build: ./requirements/mariadb/
+    container_name: mariadb
+    image: mariadb
     volumes:
       - mariadb:/var/lib/mysql/
     networks:
-      - inception
+      - my_network
     env_file:
       - .env
     restart: always
+
   wordpress:
-    image: wordpress
-    container_name: wordpress
     build: ./requirements/wordpress/
+    container_name: wordpress
+    image: wordpress
     volumes:
       - wordpress:/var/www/html/wordpress/
     networks:
-      - inception
+      - my_network
     depends_on:
       - mariadb
     env_file:
       - .env
     restart: always
+
   nginx:
-    image: nginx
-    container_name: nginx
     build: ./requirements/nginx/
+    container_name: nginx
+    image: nginx
     ports:
       - 443:443
       - 80:80
     volumes:
       - wordpress:/var/www/html/wordpress/
     networks:
-      - inception
+      - my_network
     depends_on:
       - wordpress
     restart: always
@@ -46,6 +48,7 @@ volumes:
       type: none
       o: bind
       device: /home/slaajour/data/mariadb/
+      
   wordpress:
     driver_opts:
       type: none
@@ -53,4 +56,4 @@ volumes:
       device: /home/slaajour/data/wordpress/
 
 networks:
-  inception:
+  my_network:
