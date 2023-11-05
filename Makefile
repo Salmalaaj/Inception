@@ -21,7 +21,7 @@ build:
 
 up:
 	@echo "$(GREEN)Starting containers...$(NC)"
-	@${DC} -f ${DC_PATH} up -d
+	@${DC} -f ${DC_PATH} up 
 
 down:
 	@echo "$(RED)Stopping containers...$(NC)"
